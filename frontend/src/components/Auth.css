@@ -1,0 +1,123 @@
+.auth-card {
+  max-width: 420px;
+  margin: 20px auto;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(76, 99, 182, 0.12);
+  padding: 36px 32px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #2d3a6b;
+  margin-bottom: 6px;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: #7c8ba1;
+}
+
+.auth-tabs {
+  display: flex;
+  background: #f0f4ff;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: #5c6bc0;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-tab.active {
+  background: #ffffff;
+  color: #2d3a6b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2d3a6b;
+}
+
+.form-input {
+  background-color: #f5f7ff;
+  border: 1.5px solid #c5cae9;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #4c63b6;
+}
+
+.btn-auth-submit {
+  margin-top: 8px;
+  background-color: #4c63b6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-auth-submit:hover {
+  background-color: #3a4f9a;
+}
+
+.btn-auth-submit:disabled {
+  background-color: #9fa8da;
+  cursor: not-allowed;
+}
+
+.auth-toggle-msg {
+  text-align: center;
+  font-size: 13px;
+  color: #7c8ba1;
+  margin-top: 16px;
+}
+
+.auth-toggle-link {
+  color: #4c63b6;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 4px;
+}

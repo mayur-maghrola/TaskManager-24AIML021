@@ -1,44 +1,47 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
+const authRoutes = require("./routes/authRoutes");
+const todoRoutes = require("./routes/todoRoutes");
+
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb://localhost:27017/AWDF");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
-const todoSchema = new mongoose.Schema({
-    text: { type: String, required: true },
-    isChecked: { type: Boolean, default: false }
+// Connect to MongoDB
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/AWDF";
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("Connected to MongoDB successfully."))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
+
+app.use("/api/todos", todoRoutes);
+app.use("/todos", todoRoutes);
+
+// Base route healthcheck
+app.get("/", (req, res) => {
+  res.send("Task Manager API is running...");
 });
 
-const Todo = mongoose.model("Todo", todoSchema);
-
-// GET all todos
-app.get("/todos", async (req, res) => {
-    const todos = await Todo.find();
-    res.json(todos);
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
 });
 
-// POST new todo
-app.post("/todos", async (req, res) => {
-    const { text } = req.body;
-    if (!text || text.trim().length < 3)
-        return res.status(400).json({ error: "Task must be at least 3 characters." });
-
-    const exists = await Todo.findOne({ text: text.trim() });
-    if (exists)
-        return res.status(400).json({ error: "Task already exists." });
-
-    const todo = await Todo.create({ text: text.trim() });
-    res.status(201).json(todo);
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled Error:", err.stack);
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
-// DELETE a todo
-app.delete("/todos/:id", async (req, res) => {
-    await Todo.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
-});
-
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
