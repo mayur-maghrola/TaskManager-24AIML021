@@ -71,6 +71,11 @@ router.patch("/:id", async (req, res) => {
       todo.text = req.body.text.trim();
     }
 
+    const allowedStatuses = ["Pending", "Ongoing", "Completed"];
+    if (req.body.status && allowedStatuses.includes(req.body.status)) {
+      todo.status = req.body.status;
+    }
+
     await todo.save();
     return res.json(todo);
   } catch (error) {
