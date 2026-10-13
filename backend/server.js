@@ -28,6 +28,8 @@ app.use("/auth", authRoutes);
 
 app.use("/api/todos", todoRoutes);
 app.use("/todos", todoRoutes);
+app.use("/api/tasks", todoRoutes);
+app.use("/tasks", todoRoutes);
 
 // Base route healthcheck
 app.get("/", (req, res) => {
