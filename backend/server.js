@@ -6,6 +6,9 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const todoRoutes = require("./routes/todoRoutes");
 
+// Register event listeners for EventEmitter notification system
+require("./listeners");
+
 const app = express();
 
 // Middleware

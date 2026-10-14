@@ -3,6 +3,7 @@ const Todo = require("../models/todoModel");
 const { protect } = require("../middleware/authMiddleware");
 const { validateTodo } = require("../middleware/validationMiddleware");
 const cache = require("../utils/cache");
+const taskEvents = require("../events");
 
 const router = express.Router();
 
@@ -68,13 +69,26 @@ router.post("/", validateTodo, async (req, res) => {
 
     const todo = await Todo.create({
       text: text,
+      title: req.body.title || text,
       userId: req.user._id,
     });
 
-    // Step 4: Invalidate cache after successful create
+    // Invalidate cache after successful create
     invalidateTaskCache(req.user._id);
 
-    return res.status(201).json(todo);
+    // Prepare task object with title and assigned user for notification event
+    const taskPayload = {
+      ...todo.toObject(),
+      title: todo.title || todo.text,
+      assignedUser: req.user.username || req.user.email || req.user._id,
+    };
+
+    // Respond immediately before event handler finishes executing
+    console.log(`[API] Response sent at ${new Date().toISOString()}`);
+    res.status(201).json(todo);
+
+    // Emit task-created event asynchronously
+    taskEvents.emit("task-created", taskPayload);
   } catch (error) {
     console.error("Create Todo Error:", error);
     return res.status(500).json({ error: "Failed to create task." });

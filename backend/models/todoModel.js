@@ -7,6 +7,10 @@ const todoSchema = new mongoose.Schema(
       required: [true, "Task text is required"],
       trim: true,
     },
+    title: {
+      type: String,
+      trim: true,
+    },
     isChecked: {
       type: Boolean,
       default: false,
@@ -22,8 +26,23 @@ const todoSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+// Pre-save hook to ensure both text and title are populated
+todoSchema.pre("save", function (next) {
+  if (!this.title && this.text) {
+    this.title = this.text;
+  }
+  if (!this.text && this.title) {
+    this.text = this.title;
+  }
+  next();
+});
 
 const Todo = mongoose.model("Todo", todoSchema);
 

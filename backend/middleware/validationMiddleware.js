@@ -58,8 +58,9 @@ const validateTodo = (req, res, next) => {
     });
   }
 
-  // Normalize request body so downstream handler receives trimmed text
+  // Normalize request body so downstream handler receives trimmed text and title
   req.body.text = taskContent.trim();
+  req.body.title = taskContent.trim();
   next();
 };
 
