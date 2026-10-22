@@ -1,0 +1,9 @@
+{
+  "name": "task-manager-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install --prefix backend",
+    "test": "npm test --prefix backend"
+  }
+}

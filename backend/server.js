@@ -15,15 +15,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
-// Connect to MongoDB (using Docker service name 'mongodb')
-const MONGO_URI = process.env.MONGO_URI || "mongodb://mongodb:27017/taskdb";
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("Connected to MongoDB successfully."))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  // Connect to MongoDB (using Docker service name 'mongodb')
+  const MONGO_URI = process.env.MONGO_URI || "mongodb://mongodb:27017/taskdb";
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => console.log("Connected to MongoDB successfully."))
+    .catch((err) => console.error("MongoDB connection error:", err));
+}
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -49,4 +51,6 @@ app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
+
+module.exports = app;
 

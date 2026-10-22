@@ -41,4 +41,28 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const optionalAuth = async (req, res, next) => {
+  if (
+    req.headers &&
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || "default_jwt_secret"
+      );
+      if (User.db && User.db.readyState === 1) {
+        req.user = await User.findById(decoded.id).select("-password");
+      } else {
+        req.user = { _id: decoded.id };
+      }
+    } catch (error) {
+      // Ignored for optional auth
+    }
+  }
+  next();
+};
+
+module.exports = { protect, optionalAuth };
