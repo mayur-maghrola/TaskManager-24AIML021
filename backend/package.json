@@ -15,7 +15,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.0.0",
     "node-cache": "^5.1.2",
-    "nodemailer": "^10.0.10"
+    "nodemailer": "^10.0.10",
+    "openai": "^7.42.0"
   },
   "devDependencies": {
     "jest": "^30.5.2",

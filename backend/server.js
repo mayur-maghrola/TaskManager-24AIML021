@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes");
 const todoRoutes = require("./routes/todoRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 // Register event listeners for EventEmitter notification system
 require("./listeners");
@@ -35,6 +36,9 @@ app.use("/api/todos", todoRoutes);
 app.use("/todos", todoRoutes);
 app.use("/api/tasks", todoRoutes);
 app.use("/tasks", todoRoutes);
+
+app.use("/api/ai", aiRoutes);
+app.use("/ai", aiRoutes);
 
 // Base route healthcheck
 app.get("/", (req, res) => {

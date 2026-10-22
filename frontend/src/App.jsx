@@ -14,6 +14,8 @@ import {
   LayoutList,
   FolderGit2,
   LifeBuoy,
+  Sparkles,
+  Check,
 } from "lucide-react";
 import Auth from "./components/Auth";
 import ResetPassword from "./components/ResetPassword";
@@ -25,6 +27,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 import "./App.css";
 
 const API = "http://localhost:3000/api/todos";
+const AI_API = "http://localhost:3000/api/ai/generate-description";
 
 function ConfirmModal({ onConfirm, onCancel }) {
   return (
@@ -100,6 +103,11 @@ function TasksView({ user, handleLogout }) {
   const [confirmId, setConfirmId] = useState(null);
   const [error, setError] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState("");
+  const [aiFallback, setAiFallback] = useState(false);
+  const [showAiSuggestion, setShowAiSuggestion] = useState(false);
+  const [aiNotice, setAiNotice] = useState("");
 
   const fetchTodos = async () => {
     if (!user || !user.token) return;
@@ -134,6 +142,60 @@ function TasksView({ user, handleLogout }) {
       fetchTodos();
     }
   }, [user]);
+
+  async function handleAiGenerate() {
+    const title = input.trim();
+    if (!title) {
+      setError("Please type a task title first to generate an AI description.");
+      return;
+    }
+    setError("");
+    setAiLoading(true);
+    setAiNotice("");
+
+    try {
+      const res = await fetch(AI_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(user && user.token ? { Authorization: `Bearer ${user.token}` } : {}),
+        },
+        body: JSON.stringify({ title }),
+      });
+
+      const data = await res.json();
+      if (data && data.description) {
+        setAiSuggestion(data.description);
+        setAiFallback(Boolean(data.fallback));
+        setShowAiSuggestion(true);
+        if (data.fallback) {
+          setAiNotice("Offline / Fallback mode active (AI API key test mode).");
+        }
+      } else {
+        throw new Error(data.error || "Could not generate description.");
+      }
+    } catch (err) {
+      console.error("AI Generation Error:", err);
+      setAiSuggestion(
+        `Plan deliverables, execute core action items, and verify completion criteria for "${title}".`
+      );
+      setAiFallback(true);
+      setShowAiSuggestion(true);
+      setAiNotice("Offline fallback mode: default template loaded.");
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
+  function handleAcceptAiSuggestion() {
+    if (aiSuggestion.trim()) {
+      setInput((prev) => {
+        const trimmed = prev.trim();
+        return trimmed ? `${trimmed} - ${aiSuggestion.trim()}` : aiSuggestion.trim();
+      });
+    }
+    setShowAiSuggestion(false);
+  }
 
   async function handleAdd() {
     const text = input.trim();
@@ -307,7 +369,7 @@ function TasksView({ user, handleLogout }) {
               <input
                 type="text"
                 className="todo-user-input"
-                placeholder="What needs to be done?"
+                placeholder="What needs to be done? (e.g. Study for AWDF exam)"
                 value={input}
                 onChange={(e) => {
                   setInput(e.target.value);
@@ -315,10 +377,71 @@ function TasksView({ user, handleLogout }) {
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               />
+              <button
+                type="button"
+                className="btn-ai-generate"
+                onClick={handleAiGenerate}
+                disabled={aiLoading}
+                title="Auto-generate task description with AI"
+              >
+                <Sparkles size={16} />
+                {aiLoading ? "Generating..." : "AI Suggest"}
+              </button>
               <button className="btn-add" onClick={handleAdd}>
                 <Plus size={16} /> Add
               </button>
             </div>
+
+            {/* AI Suggestion Editable Card */}
+            {showAiSuggestion && (
+              <div className="ai-suggestion-card">
+                <div className="ai-suggestion-header">
+                  <div className="ai-suggestion-title">
+                    <Sparkles size={16} /> AI Suggested Description
+                  </div>
+                  <span
+                    className={`ai-badge ${
+                      aiFallback ? "ai-badge--fallback" : "ai-badge--online"
+                    }`}
+                  >
+                    {aiFallback ? "Fallback / Offline Mode" : "GPT-4o-mini"}
+                  </span>
+                </div>
+                {aiNotice && (
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "#b45309",
+                      margin: "0 0 8px 0",
+                    }}
+                  >
+                    {aiNotice}
+                  </p>
+                )}
+                <textarea
+                  className="ai-suggestion-textarea"
+                  value={aiSuggestion}
+                  onChange={(e) => setAiSuggestion(e.target.value)}
+                  placeholder="Review or edit the AI-generated description..."
+                />
+                <div className="ai-suggestion-actions">
+                  <button
+                    type="button"
+                    className="btn-ai-dismiss"
+                    onClick={() => setShowAiSuggestion(false)}
+                  >
+                    Dismiss
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-ai-accept"
+                    onClick={handleAcceptAiSuggestion}
+                  >
+                    <Check size={14} /> Accept & Append
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Filter Tabs */}
             <div className="filter-tabs">
