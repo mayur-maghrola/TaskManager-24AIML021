@@ -26,8 +26,8 @@ const Projects = lazy(() => import("./pages/Projects"));
 const Contact = lazy(() => import("./pages/Contact"));
 import "./App.css";
 
-const API = "http://localhost:3000/api/todos";
-const AI_API = "http://localhost:3000/api/ai/generate-description";
+const API = (import.meta.env.VITE_API_URL || "https://taskmanager-backend-brd0.onrender.com") + "/api/todos";
+const AI_API = (import.meta.env.VITE_API_URL || "https://taskmanager-backend-brd0.onrender.com") + "/api/ai/generate-description";
 
 function ConfirmModal({ onConfirm, onCancel }) {
   return (

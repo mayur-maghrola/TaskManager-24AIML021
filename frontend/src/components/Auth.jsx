@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { AlertTriangle, UserPlus, LogIn } from "lucide-react";
 import "./Auth.css";
 
-const AUTH_API = "http://localhost:3000/api/auth";
+const AUTH_API = (import.meta.env.VITE_API_URL || "https://taskmanager-backend-brd0.onrender.com") + "/api/auth";
 
 export default function Auth({ onAuthSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
